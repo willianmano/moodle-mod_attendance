@@ -317,10 +317,36 @@ class user_sessions_cells_text_generator extends user_sessions_cells_generator {
 function attendance_strftimehm($time) {
     $mins = userdate($time, '%M');
     if ($mins == '00') {
-        return userdate($time, get_string('strftimeh', 'attendance'));
+        $format = get_string('strftimeh', 'attendance');
     } else {
-        return userdate($time, get_string('strftimehm', 'attendance'));
+        $format = get_string('strftimehm', 'attendance');
     }
+
+    $userdate = userdate($time, $format);
+
+    // Some Lang packs use %p to suffix with AM/PM but not all strftime support this.
+    // Check if format includes %p and if AM/PM is missing.
+    if (strpos(strtolower($format), '%p') &&
+        strpos(strtolower($userdate), 'am') === false &&
+        strpos(strtolower($userdate), 'pm') === false) {
+        // Missing AM/PM from string - fix it.
+        if (userdate($time, '%H') > 11) {
+            $userdate .= 'pm';
+        } else {
+            $userdate .= 'am';
+        }
+    }
+
+    // Set correct case based on setting - some O/S mix this up incorrectly.
+    if (strpos($format, '%p')) { // Should be upper case.
+        $userdate = str_replace('am', 'AM', $userdate);
+        $userdate = str_replace('pm', 'PM', $userdate);
+    } else if (strpos($format, '%P')) { // Should be lower case.
+        $userdate = str_replace('AM', 'am', $userdate);
+        $userdate = str_replace('PM', 'pm', $userdate);
+    }
+
+    return $userdate;
 }
 
 /**
