@@ -58,6 +58,17 @@ $capabilities = array(
         )
     ),
 
+    'mod/attendance:printnametags' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     'mod/attendance:takeattendances' => array(
         'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',

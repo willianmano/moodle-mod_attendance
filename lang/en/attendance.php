@@ -520,3 +520,7 @@ $string['includeabsentee'] = 'Include session when calculating absentee report';
 $string['includeabsentee_help'] = 'If checked this session will be included in the absentee report calculations.';
 $string['attendance_no_status'] = 'No valid status was available - you may be too late to record attendance.';
 $string['studentmarked'] = 'Your attendance in this session has been recorded.';
+$string['nametagspage'] = 'Print name tags';
+$string['keywords'] = 'certificate, course, pdf, moodle';
+$string['printallnametags'] = 'Print all name tags';
+$string['printnametag'] = 'Print name tag';
