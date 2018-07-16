@@ -43,7 +43,7 @@ if ($userid) {
                 strip_tags(format_string($userfullname, true))
             )) . '.pdf';
     $pdf = attendance_create_nametags_pdf_object($userfullname, $course->shortname);
-    attendance_create_user_nametag($user, $pdf);
+    attendance_create_user_nametag($user, $course, $pdf);
     $pdf->Output($filename, 'D');
     exit();
 }
@@ -60,7 +60,7 @@ $filename = str_replace(' ', '_',
     )) . '.pdf';
 $pdf = attendance_create_nametags_pdf_object($attrecord->name, $course->shortname);
 foreach ($reportdata->users as $user) {
-    attendance_create_user_nametag($user, $pdf);
+    attendance_create_user_nametag($user, $course, $pdf);
 }
 $pdf->Output($filename, 'D');
 exit();

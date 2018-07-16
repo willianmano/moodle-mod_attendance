@@ -44,6 +44,10 @@ define('ATTENDANCE_AUTOMARK_DISABLED', 0);
 define('ATTENDANCE_AUTOMARK_ALL', 1);
 define('ATTENDANCE_AUTOMARK_CLOSE', 2);
 
+define('ATTENDANCE_NAMETAG_WIDTH', 107);
+define('ATTENDANCE_NAMETAG_HEIGHT', 36);
+define('ATTENDANCE_NAMETAG_SECRET', 'Wc01yOicillookptCalawrqsEkWijfilImFokDoidLidMafnabrendyecet');
+
 // Max number of sessions available in the warnings set form to trigger warnings.
 define('ATTENDANCE_MAXWARNAFTER', 100);
 
@@ -947,7 +951,7 @@ function attendance_create_nametags_pdf_object($instancename, $coursename) {
     $keywords = get_string('keywords', 'mod_attendance') . ',' . format_string($coursename, true);
     $keywords = str_replace(",", " ", $keywords); // Replace commas with spaces.
     $keywords = str_replace("  ", " ", $keywords); // Replace two spaces with one.
-    $pdf = new pdf($orientation, 'mm', array(75, 50), true, 'UTF-8');
+    $pdf = new pdf($orientation, 'mm', array(ATTENDANCE_NAMETAG_WIDTH, ATTENDANCE_NAMETAG_HEIGHT), true, 'UTF-8');
     $pdf->SetTitle($instancename);
     $pdf->SetSubject($instancename . ' - ' . $coursename);
     $pdf->SetKeywords($keywords);
@@ -971,10 +975,8 @@ function attendance_nametags_qrcode($pdf, $user) {
         'bgcolor' => array(255, 255, 255), // White.
         'module_width' => 1, // Width of a single module in points.
         'module_height' => 1); // Height of a single module in points.
-    $qrcode = $user->id . ',' . sha1(
-            'IrcOsoicellooketCalkaumsEkWijfilImFokDoidLidMafniwrendyecet/' . $user->id
-        );
-    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 25, 2, 25, 25,
+    $qrcode = $user->id . ',' . sha1(ATTENDANCE_NAMETAG_SECRET . '/' . $user->id);
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 80, 6, 25, 25,
         $style, 'N');
 }
 
@@ -986,10 +988,15 @@ function attendance_nametags_qrcode($pdf, $user) {
  * @param bool $isbulk Tell if it is a bulk operation or not
  * @return mixed PDF object or error
  */
-function attendance_create_user_nametag(stdClass $user, $pdf = null) {
+function attendance_create_user_nametag(stdClass $user, $course, $pdf = null) {
     $pdf->AddPage();
     // Print QR code in first page (if enable).
     attendance_nametags_qrcode($pdf, $user);
+
+    $pdf->SetXY(0, 1);
+    $pdf->writeHTMLCell(100, 10, '', '', $course->fullname, 0, 0, 0,
+        true, 'C');
+
     $fullname = ucwords(mb_strtolower($user->firstname . ' ' . $user->lastname, 'UTF-8'));
     $firstlastname = '';
     $conectivos = array('da', 'de', 'do', 'e', 'das', 'dos');
@@ -1004,11 +1011,11 @@ function attendance_create_user_nametag(stdClass $user, $pdf = null) {
     $firstlastname = array_pop($arrfullname);
     $firstlastname = current($arrfullname) . ' ' . $firstlastname;
     $firstlastname = "<h2>{$firstlastname}</h2>";
-    $pdf->SetXY(0, 30);
+    $pdf->SetXY(0, 7);
     $pdf->writeHTMLCell(75, 10, '', '', $firstlastname, 0, 0, 0,
-        true, 'C');
-    $pdf->SetXY(0, 40);
+        true, 'L');
+    $pdf->SetXY(0, 17);
     $pdf->writeHTMLCell(75, 10, '', '', $fullname, 0, 0, 0,
-        true, 'C');
+        true, 'L');
     return $pdf;
 }
