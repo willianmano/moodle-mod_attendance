@@ -976,7 +976,7 @@ function attendance_nametags_qrcode($pdf, $user) {
         'module_width' => 1, // Width of a single module in points.
         'module_height' => 1); // Height of a single module in points.
     $qrcode = $user->id . ',' . sha1(ATTENDANCE_NAMETAG_SECRET . '/' . $user->id);
-    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 80, 6, 25, 25,
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 80, 10, 25, 25,
         $style, 'N');
 }
 
@@ -1011,10 +1011,10 @@ function attendance_create_user_nametag(stdClass $user, $course, $pdf = null) {
     $firstlastname = array_pop($arrfullname);
     $firstlastname = current($arrfullname) . ' ' . $firstlastname;
     $firstlastname = "<h2>{$firstlastname}</h2>";
-    $pdf->SetXY(0, 7);
+    $pdf->SetXY(3, 12);
     $pdf->writeHTMLCell(75, 10, '', '', $firstlastname, 0, 0, 0,
         true, 'L');
-    $pdf->SetXY(0, 17);
+    $pdf->SetXY(3, 22);
     $pdf->writeHTMLCell(75, 10, '', '', $fullname, 0, 0, 0,
         true, 'L');
     return $pdf;
