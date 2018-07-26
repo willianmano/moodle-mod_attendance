@@ -44,9 +44,9 @@ define('ATTENDANCE_AUTOMARK_DISABLED', 0);
 define('ATTENDANCE_AUTOMARK_ALL', 1);
 define('ATTENDANCE_AUTOMARK_CLOSE', 2);
 
-define('ATTENDANCE_NAMETAG_WIDTH', 107);
-define('ATTENDANCE_NAMETAG_HEIGHT', 36);
-define('ATTENDANCE_NAMETAG_SECRET', 'Wc01yOicillookptCalawrqsEkWijfilImFokDoidLidMafnabrendyecet');
+define('ATTENDANCE_NAMETAG_WIDTH', 60);
+define('ATTENDANCE_NAMETAG_HEIGHT', 40);
+define('ATTENDANCE_NAMETAG_SECRET', 'oVWvMVsOSUzHhbO9VmSyhTf5WlQMAnztmvC3eSYVRtAmjdC4eLjtcXtdlj5');
 
 // Max number of sessions available in the warnings set form to trigger warnings.
 define('ATTENDANCE_MAXWARNAFTER', 100);
@@ -976,7 +976,7 @@ function attendance_nametags_qrcode($pdf, $user) {
         'module_width' => 1, // Width of a single module in points.
         'module_height' => 1); // Height of a single module in points.
     $qrcode = $user->id . ',' . sha1(ATTENDANCE_NAMETAG_SECRET . '/' . $user->id);
-    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 80, 10, 25, 25,
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 18, 1, 25, 25,
         $style, 'N');
 }
 
@@ -993,10 +993,6 @@ function attendance_create_user_nametag(stdClass $user, $course, $pdf = null) {
     // Print QR code in first page (if enable).
     attendance_nametags_qrcode($pdf, $user);
 
-    $pdf->SetXY(0, 1);
-    $pdf->writeHTMLCell(100, 10, '', '', $course->fullname, 0, 0, 0,
-        true, 'C');
-
     $fullname = ucwords(mb_strtolower($user->firstname . ' ' . $user->lastname, 'UTF-8'));
     $firstlastname = '';
     $conectivos = array('da', 'de', 'do', 'e', 'das', 'dos');
@@ -1011,11 +1007,11 @@ function attendance_create_user_nametag(stdClass $user, $course, $pdf = null) {
     $firstlastname = array_pop($arrfullname);
     $firstlastname = current($arrfullname) . ' ' . $firstlastname;
     $firstlastname = "<h2>{$firstlastname}</h2>";
-    $pdf->SetXY(3, 12);
-    $pdf->writeHTMLCell(75, 10, '', '', $firstlastname, 0, 0, 0,
-        true, 'L');
-    $pdf->SetXY(3, 22);
-    $pdf->writeHTMLCell(75, 10, '', '', $fullname, 0, 0, 0,
-        true, 'L');
+    $pdf->SetXY(0, 25);
+    $pdf->writeHTMLCell(60, 10, '', '', $firstlastname, 0, 0, 0,
+        true, 'C');
+    $pdf->SetXY(0, 32);
+    $pdf->writeHTMLCell(60, 10, '', '', $fullname, 0, 0, 0,
+        true, 'C');
     return $pdf;
 }
