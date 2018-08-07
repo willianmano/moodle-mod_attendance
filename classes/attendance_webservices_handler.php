@@ -155,4 +155,65 @@ class attendance_handler {
             $DB->update_record('attendance_sessions', $attendancesession);
         }
     }
+
+    /**
+     * For this user, this method searches in all the courses that this user has permission to take attendance,
+     * looking for today sessions and returns the courses with the sessions.
+     * @param int $userid
+     * @return array
+     */
+    public static function get_courses_with_today_sessions_statuses($userid) {
+        $usercourses = enrol_get_users_courses($userid);
+        $attendanceinstance = get_all_instances_in_courses('attendance', $usercourses);
+
+        $coursessessions = array();
+
+        foreach ($attendanceinstance as $attendance) {
+            $context = context_course::instance($attendance->course);
+            if (has_capability('mod/attendance:takeattendances', $context, $userid)) {
+                $course = $usercourses[$attendance->course];
+                $course->attendance_instance = array();
+
+                $att = new stdClass();
+                $att->id = $attendance->id;
+                $att->course = $attendance->course;
+                $att->name = $attendance->name;
+                $att->grade = $attendance->grade;
+
+                $cm = new stdClass();
+                $cm->id = $attendance->coursemodule;
+
+                $att = new mod_attendance_structure($att, $cm, $course, $context);
+                $course->attendance_instance[$att->id] = array();
+                $course->attendance_instance[$att->id]['name'] = $att->name;
+
+                $statuses = attendance_get_statuses($att->id, true);
+
+                $arrstatus = [];
+                foreach ($statuses as $status) {
+                    $arrstatus[] = $status->id;
+                }
+
+                $course->attendance_instance[$att->id]['statuses'] = json_encode($arrstatus);
+
+                $todaysessions = $att->get_today_sessions();
+
+                if (!empty($todaysessions)) {
+                    $course->attendance_instance[$att->id]['today_sessions'] = $todaysessions;
+                    $coursessessions[$course->id] = $course;
+                }
+            }
+        }
+
+        $returndata = [];
+        foreach ($coursessessions as $c) {
+            $returndata[$c->id] = new stdClass();
+            $returndata[$c->id]->shortname = $c->shortname;
+            $returndata[$c->id]->fullname = $c->fullname;
+            $returndata[$c->id]->attendance_instances = $c->attendance_instance;
+            $returndata[$c->id]->statuses = $c->statuses;
+        }
+
+        return $returndata;
+    }
 }
