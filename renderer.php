@@ -1230,13 +1230,65 @@ class mod_attendance_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Build and return the rows that will make up the left part of the attendance report.
+     * Build and return the rows that will make up the left part of the nametags report.
      * This consists of student names and icons, as well as header cells for these columns.
      *
      * @param attendance_report_data $reportdata the report data
      * @return array Array of html_table_row objects
      */
-    protected function get_user_rows(attendance_report_data $reportdata) {
+    protected function get_nametags_rows($reportdata) {
+        $rows = array();
+        $extrafields = get_extra_user_fields($reportdata->att->context);
+        $row = new html_table_row();
+        $row->cells[] = $this->build_header_cell('');
+        $row->cells[] = $this->build_header_cell($this->construct_fullname_head($reportdata), false, false);
+        foreach ($extrafields as $field) {
+            $row->cells[] = $this->build_header_cell(get_string($field), false, false);
+        }
+        $btnprintallnamgetags = "<a href='".$reportdata->url_printnametags()."' class='btn btn-info'><i class='fa fa-print'></i> ".get_string('printallnametags', 'mod_attendance')."</a>";
+        $row->cells[] = $this->build_header_cell($btnprintallnamgetags);
+        $rows[] = $row;
+        foreach ($reportdata->users as $user) {
+            $row = new html_table_row();
+            $row->cells[] = $this->build_data_cell($this->user_picture($user));
+            $text = html_writer::link($reportdata->url_view(array('studentid' => $user->id)), fullname($user));
+            $row->cells[] = $this->build_data_cell($text, false, false, null, null, false);
+            foreach ($extrafields as $field) {
+                $row->cells[] = $this->build_data_cell($user->$field, false, false);
+            }
+            $btnprintnamgetag = "<a href='".$reportdata->url_printnametags(['userid' => $user->id])."' class='btn btn-default'><i class='fa fa-print'></i> ".get_string('printnametag', 'mod_attendance')."</a>";
+            $row->cells[] = $this->build_data_cell($btnprintnamgetag, false, false);
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
+    /**
+     * Render name tages data.
+     *
+     * @param attendance_nametags_data $reportdata
+     * @return string
+     */
+    protected function render_attendance_nametags_data(attendance_nametags_data $reportdata) {
+        global $PAGE, $COURSE;
+        $table = new html_table();
+        $table->attributes['class'] = 'generaltable attwidth attreport';
+        $userrows = $this->get_nametags_rows($reportdata);
+        // Extract rows from each part and collate them into one row each.
+        foreach ($userrows as $index => $row) {
+            $table->data[] = $row;
+        }
+        return html_writer::table($table).html_writer::tag('div', get_string('users').': '.count($reportdata->users));
+    }
+
+    /**
+     * Build and return the rows that will make up the left part of the attendance report.
+     * This consists of student names and icons, as well as header cells for these columns.
+     *
+     * @param $reportdata the report data
+     * @return array Array of html_table_row objects
+     */
+    protected function get_user_rows($reportdata) {
         global $OUTPUT;
         $rows = array();
         $extrafields = get_extra_user_fields($reportdata->att->context);

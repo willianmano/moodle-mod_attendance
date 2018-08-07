@@ -542,3 +542,7 @@ $string['privacy:metadata:timesent'] = 'Timestamp when warning was sent.';
 $string['privacy:metadata:attendancelog'] = 'Log of user attendances recorded.';
 $string['privacy:metadata:attendancesessions'] = 'Sessions to which attendance will be recorded.';
 $string['privacy:metadata:attendancewarningdone'] = 'Log of warnings sent to users over their attendance record.';
+$string['nametagspage'] = 'Print name tags';
+$string['keywords'] = 'certificate, course, pdf, moodle';
+$string['printallnametags'] = 'Print all name tags';
+$string['printnametag'] = 'Print name tag';

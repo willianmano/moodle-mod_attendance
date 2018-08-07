@@ -57,6 +57,8 @@ class attendance_tabs implements renderable {
     const TAB_ABSENTEE      = 9;
     /** @var int current tab */
     public $currenttab;
+    /** Print tags tab */
+    const TAB_NAMETAGS      = 10;
 
     /** @var stdClass attendance */
     private $att;
@@ -129,6 +131,10 @@ class attendance_tabs implements renderable {
                             $this->att->url_sessions()->out(true,
                                 array('action' => mod_attendance_sessions_page_params::ACTION_UPDATE)),
                                 get_string('changesession', 'attendance'));
+        }
+        if (has_capability('mod/attendance:viewreports', $context)) {
+            $toprow[] = new tabobject(self::TAB_NAMETAGS, $this->att->url_nametags()->out(),
+                get_string('nametagspage', 'attendance'));
         }
 
         return array($toprow);
@@ -628,6 +634,71 @@ class attendance_report_data implements renderable {
 }
 
 /**
+ * Class name tags data.
+ *
+ * @copyright  2017 Willian Mano <willianmanoaraujo@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class attendance_nametags_data implements renderable {
+    /** @var array|null|stdClass  */
+    public $pageparams;
+    /** @var array  */
+    public $users;
+    /** @var array  */
+    public $summary = array();
+    /** @var mod_attendance_structure  */
+    public $att;
+    /**
+     * attendance_report_data constructor.
+     * @param mod_attendance_structure $att
+     */
+    public function  __construct(mod_attendance_structure $att) {
+        $currenttime = time();
+        if ($att->pageparams->view == ATT_VIEW_NOTPRESENT) {
+            $att->pageparams->enddate = $currenttime;
+        }
+        $this->pageparams = $att->pageparams;
+        $this->users = $att->get_users();
+        $this->summary = new mod_attendance_summary($att->id, array_keys($this->users));
+        $this->att = $att;
+    }
+    /**
+     * url take helper.
+     * @param int $sessionid
+     * @param int $grouptype
+     * @return mixed
+     */
+    public function url_take($sessionid, $grouptype) {
+        return url_helpers::url_take($this->att, $sessionid, $grouptype);
+    }
+    /**
+     * url view helper.
+     * @param array $params
+     * @return mixed
+     */
+    public function url_view($params=array()) {
+        return url_helpers::url_view($this->att, $params);
+    }
+    /**
+     * url helper.
+     * @param array $params
+     * @return moodle_url
+     */
+    public function url($params=array()) {
+        $params = array_merge($params, $this->pageparams->get_significant_params());
+        return $this->att->url_report($params);
+    }
+    /**
+     * url view helper.
+     * @param array $params
+     * @return mixed
+     */
+    public function url_printnametags($params = array()) {
+        return url_helpers::url_printnametags($this->att, $params);
+    }
+}
+
+/**
  * Class preferences data.
  *
  * @copyright  2011 Artem Andreev <andreev.artem@gmail.com>
@@ -807,6 +878,16 @@ class url_helpers {
      */
     public static function url_view($att, $params=array()) {
         return $att->url_view($params);
+    }
+
+    /**
+     * Url nametag helper.
+     * @param stdClass $att
+     * @param array $params
+     * @return mixed
+     */
+    public static function url_printnametags($att, $params=array()) {
+        return $att->url_printnametags($params);
     }
 }
 
