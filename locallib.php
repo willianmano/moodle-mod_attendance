@@ -47,9 +47,9 @@ define('ATTENDANCE_AUTOMARK_CLOSE', 2);
 // Max number of sessions available in the warnings set form to trigger warnings.
 define('ATTENDANCE_MAXWARNAFTER', 100);
 
-define('ATTENDANCE_NAMETAG_WIDTH', 75);
-define('ATTENDANCE_NAMETAG_HEIGHT', 50);
-define('ATTENDANCE_NAMETAG_SECRET', 'IrcOsoicellooketCalkaumsEkWijfilImFokDoidLidMafniwrendyecet');
+define('ATTENDANCE_NAMETAG_WIDTH', 60);
+define('ATTENDANCE_NAMETAG_HEIGHT', 40);
+define('ATTENDANCE_NAMETAG_SECRET', 'oVWvMVsOSUzHhbO9VmSyhTf5WlQMAnztmvC3eSYVRtAmjdC4eLjtcXtdlj5');
 
 /**
  * Get statuses,
@@ -977,7 +977,7 @@ function attendance_nametags_qrcode($pdf, $user) {
     $qrcode = $user->id . ',' . sha1(
             ATTENDANCE_NAMETAG_SECRET . '/' . $user->id
         );
-    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 25, 2, 25, 25,
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 18, 1, 25, 25,
         $style, 'N');
 }
 
@@ -1007,11 +1007,11 @@ function attendance_create_user_nametag(stdClass $user, $pdf = null) {
     $firstlastname = array_pop($arrfullname);
     $firstlastname = current($arrfullname) . ' ' . $firstlastname;
     $firstlastname = "<h2>{$firstlastname}</h2>";
-    $pdf->SetXY(0, 30);
-    $pdf->writeHTMLCell(75, 10, '', '', $firstlastname, 0, 0, 0,
+    $pdf->SetXY(0, 25);
+    $pdf->writeHTMLCell(60, 10, '', '', $firstlastname, 0, 0, 0,
         true, 'C');
-    $pdf->SetXY(0, 40);
-    $pdf->writeHTMLCell(75, 10, '', '', $fullname, 0, 0, 0,
+    $pdf->SetXY(0, 32);
+    $pdf->writeHTMLCell(60, 10, '', '', $fullname, 0, 0, 0,
         true, 'C');
     return $pdf;
 }
