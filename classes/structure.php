@@ -371,6 +371,25 @@ class mod_attendance_structure {
     }
 
     /**
+     * Get url for name tags tab.
+     * @param array $params
+     * @return moodle_url of report.php for attendance instance
+     */
+    public function url_nametags($params=array()) {
+        $params = array_merge(array('id' => $this->cm->id), $params);
+        return new moodle_url('/mod/attendance/nametags.php', $params);
+    }
+    /**
+     * Get url for name tags.
+     * @param array $params
+     * @return moodle_url of report.php for attendance instance
+     */
+    public function url_printnametags($params=array()) {
+        $params = array_merge(array('id' => $this->cm->id), $params);
+        return new moodle_url('/mod/attendance/nametags_print.php', $params);
+    }
+
+    /**
      * Get url for report.
      * @param array $params
      * @return moodle_url of report.php for attendance instance

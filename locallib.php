@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/gradelib.php');
 require_once(dirname(__FILE__).'/renderhelpers.php');
+require_once($CFG->libdir . '/pdflib.php');
 
 define('ATT_VIEW_DAYS', 1);
 define('ATT_VIEW_WEEKS', 2);
@@ -49,6 +50,10 @@ define('ATTENDANCE_SHAREDIP_FORCE', 2);
 
 // Max number of sessions available in the warnings set form to trigger warnings.
 define('ATTENDANCE_MAXWARNAFTER', 100);
+
+define('ATTENDANCE_NAMETAG_WIDTH', 89);
+define('ATTENDANCE_NAMETAG_HEIGHT', 28);
+define('ATTENDANCE_NAMETAG_SECRET', 'WillsoicellooketCalkaumsEkWijfilImFokDoidLidMafniwrendyecet');
 
 /**
  * Get statuses,
@@ -1181,4 +1186,64 @@ function attendance_return_passwords($session) {
 
     $sql = 'SELECT * FROM {attendance_rotate_passwords} WHERE attendanceid = ? AND expirytime > ? ORDER BY expirytime ASC';
     return json_encode($DB->get_records_sql($sql, ['attendanceid' => $session->id, time()], $strictness = IGNORE_MISSING));
+}
+
+/**
+ * Create PDF object using parameters
+ *
+ * @return PDF
+ */
+function attendance_create_nametags_pdf_object($instancename, $coursename) {
+    // Default orientation is Landescape.
+    $orientation = 'L';
+    // Remove commas to avoid a bug in TCPDF where a string containing a commas will result in two strings.
+    $keywords = get_string('keywords', 'mod_attendance') . ',' . format_string($coursename, true);
+    $keywords = str_replace(",", " ", $keywords); // Replace commas with spaces.
+    $keywords = str_replace("  ", " ", $keywords); // Replace two spaces with one.
+    $pdf = new pdf($orientation, 'mm', array(ATTENDANCE_NAMETAG_WIDTH, ATTENDANCE_NAMETAG_HEIGHT), true, 'UTF-8');
+    $pdf->SetTitle($instancename);
+    $pdf->SetSubject($instancename . ' - ' . $coursename);
+    $pdf->SetKeywords($keywords);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    $pdf->SetAutoPageBreak(false, 0);
+    $pdf->setFontSubsetting(true);
+    $pdf->SetMargins(0, 0, 0, true);
+    return $pdf;
+}
+/**
+ * Put a QR code in nametag pdf object
+ *
+ * @param pdf $pdf The pdf object
+ * @param string $user The user object
+ */
+function attendance_nametags_qrcode($pdf, $user) {
+    $style = array('border' => 0, 'vpadding' => 'auto', 'hpadding' => 'auto',
+        'fgcolor' => array(0, 0, 0),  // Black.
+        'bgcolor' => array(255, 255, 255), // White.
+        'module_width' => 1, // Width of a single module in points.
+        'module_height' => 1); // Height of a single module in points.
+    $qrcode = $user->id . ',' . sha1(
+            ATTENDANCE_NAMETAG_SECRET . '/' . $user->id
+        );
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 4, 1, 25, 25,
+        $style, 'N');
+}
+/**
+ * Create user nameta.
+ *
+ * @param stdClass $user The user obeject
+ * @param PDF $pdf A PDF object, if null will create one
+ * @param bool $isbulk Tell if it is a bulk operation or not
+ * @return mixed PDF object or error
+ */
+function attendance_create_user_nametag(stdClass $user, $pdf = null) {
+    $pdf->AddPage();
+    // Print QR code in first page (if enable).
+    attendance_nametags_qrcode($pdf, $user);
+    $fullname = '<h2>' . ucwords(mb_strtolower($user->firstname . ' ' . $user->lastname, 'UTF-8')) . '</h2>';
+    $pdf->SetXY(28, 8);
+    $pdf->writeHTMLCell(56, 20, '', '', $fullname, 0, 0, 0,
+        true, 'C');
+    return $pdf;
 }

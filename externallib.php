@@ -541,4 +541,39 @@ class mod_wsattendance_external extends external_api {
     public static function update_user_status_returns() {
         return new external_value(PARAM_TEXT, 'Http code');
     }
+
+    /**
+     * Get parameter list.
+     * @return external_function_parameters
+     */
+    public static function get_courses_with_today_sessions_statuses_parameters() {
+        return new external_function_parameters (
+            array('userid' => new external_value(PARAM_INT, 'User id.',  VALUE_DEFAULT, 0)));
+    }
+
+    /**
+     * Get list of courses with active sessions for today.
+     * @param int $userid
+     * @return array
+     */
+    public static function get_courses_with_today_sessions_statuses($userid) {
+        return attendance_handler::get_courses_with_today_sessions_statuses($userid);
+    }
+
+    /**
+     * Show structure of return.
+     * @return external_multiple_structure
+     */
+    public static function get_courses_with_today_sessions_statuses_returns() {
+        $todaysessions = self::get_session_structure();
+        $attendanceinstances = array('name' => new external_value(PARAM_TEXT, 'Attendance name.'),
+            'statuses' => new external_value(PARAM_TEXT, 'the statuses json array'),
+            'today_sessions' => new external_multiple_structure(
+                new external_single_structure($todaysessions)));
+        $courses = array('shortname' => new external_value(PARAM_TEXT, 'short name of a moodle course.'),
+            'fullname' => new external_value(PARAM_TEXT, 'full name of a moodle course.'),
+            'attendance_instances' => new external_multiple_structure(
+                new external_single_structure($attendanceinstances)));
+        return new external_multiple_structure(new external_single_structure(($courses)));
+    }
 }

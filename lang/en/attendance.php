@@ -574,3 +574,8 @@ $string['formattexttype'] = 'Formatting';
 $string['currentlyselectedusers'] = 'Currently selected users';
 $string['usemessageform'] = 'or use the form below to send a message to the selected students';
 $string['backtoparticipants'] = 'Back to participants list';
+
+$string['nametagspage'] = 'Imprimir etiquetas';
+$string['keywords'] = 'certificate, course, pdf, moodle';
+$string['printallnametags'] = 'Imprimir todas as etiquetas';
+$string['printnametag'] = 'Imprimir etiqueta';

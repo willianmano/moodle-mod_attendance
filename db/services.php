@@ -74,6 +74,14 @@ $functions = array(
         'classpath'   => 'mod/attendance/externallib.php',
         'description' => 'Method that updates the user status in a session.',
         'type'        => 'write',
+    ),
+
+    'mod_wsattendance_get_courses_with_today_sessions_statuses' => array(
+        'classname'   => 'mod_wsattendance_external',
+        'methodname'  => 'get_courses_with_today_sessions_statuses',
+        'classpath'   => 'mod/attendance/externallib.php',
+        'description' => 'Method that retrieves courses with today sessions of a teacher with the statuses.',
+        'type'        => 'read',
     )
 );
 
@@ -88,7 +96,8 @@ $services = array(
             'mod_attendance_remove_session',
             'mod_wsattendance_get_courses_with_today_sessions',
             'mod_wsattendance_get_session',
-            'mod_wsattendance_update_user_status'
+            'mod_wsattendance_update_user_status',
+            'mod_wsattendance_get_courses_with_today_sessions_statuses'
         ),
         'restrictedusers' => 0,
         'enabled' => 1,
