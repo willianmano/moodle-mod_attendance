@@ -51,9 +51,9 @@ define('ATTENDANCE_SHAREDIP_FORCE', 2);
 // Max number of sessions available in the warnings set form to trigger warnings.
 define('ATTENDANCE_MAXWARNAFTER', 100);
 
-define('ATTENDANCE_NAMETAG_WIDTH', 89);
-define('ATTENDANCE_NAMETAG_HEIGHT', 28);
-define('ATTENDANCE_NAMETAG_SECRET', 'WillsoicellooketCalkaumsEkWijfilImFokDoidLidMafniwrendyecet');
+define('ATTENDANCE_NAMETAG_WIDTH', 75);
+define('ATTENDANCE_NAMETAG_HEIGHT', 50);
+define('ATTENDANCE_NAMETAG_SECRET', 'IrcOsoicellooketCalkaumsEkWijfilImFokDoidLidMafniwrendyecet');
 
 /**
  * Get statuses,
@@ -1226,7 +1226,7 @@ function attendance_nametags_qrcode($pdf, $user) {
     $qrcode = $user->id . ',' . sha1(
             ATTENDANCE_NAMETAG_SECRET . '/' . $user->id
         );
-    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 4, 1, 25, 25,
+    $pdf->write2DBarcode($qrcode, 'QRCODE,M', 25, 2, 25, 25,
         $style, 'N');
 }
 /**
@@ -1241,9 +1241,25 @@ function attendance_create_user_nametag(stdClass $user, $pdf = null) {
     $pdf->AddPage();
     // Print QR code in first page (if enable).
     attendance_nametags_qrcode($pdf, $user);
-    $fullname = '<h2>' . ucwords(mb_strtolower($user->firstname . ' ' . $user->lastname, 'UTF-8')) . '</h2>';
-    $pdf->SetXY(28, 8);
-    $pdf->writeHTMLCell(56, 20, '', '', $fullname, 0, 0, 0,
+    $fullname = ucwords(mb_strtolower($user->firstname . ' ' . $user->lastname, 'UTF-8'));
+    $firstlastname = '';
+    $conectivos = array('da', 'de', 'do', 'e', 'das', 'dos');
+    $arrfullname = explode(" ", $fullname);
+    foreach ($conectivos as $conectivo) {
+        foreach ($arrfullname as $key => $name) {
+            if ($name == $conectivo) {
+                unset($arrfullname[$key]);
+            }
+        }
+    }
+    $firstlastname = array_pop($arrfullname);
+    $firstlastname = current($arrfullname) . ' ' . $firstlastname;
+    $firstlastname = "<h2>{$firstlastname}</h2>";
+    $pdf->SetXY(0, 30);
+    $pdf->writeHTMLCell(75, 10, '', '', $firstlastname, 0, 0, 0,
+        true, 'C');
+    $pdf->SetXY(0, 40);
+    $pdf->writeHTMLCell(75, 10, '', '', $fullname, 0, 0, 0,
         true, 'C');
     return $pdf;
 }
